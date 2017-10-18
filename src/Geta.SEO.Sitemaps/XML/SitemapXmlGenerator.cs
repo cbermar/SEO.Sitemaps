@@ -13,6 +13,7 @@ using EPiServer.Core;
 using EPiServer.DataAbstraction;
 using EPiServer.Framework.Cache;
 using EPiServer.Logging.Compatibility;
+using EPiServer.ServiceLocation;
 using EPiServer.Web;
 using EPiServer.Web.Routing;
 using Geta.SEO.Sitemaps.Entities;
@@ -175,6 +176,16 @@ namespace Geta.SEO.Sitemaps.XML
                 {
                     return Enumerable.Empty<XElement>();
                 }
+
+				// check no-index flag
+	            var contentLoader = ServiceLocator.Current.GetInstance<IContentLoader>();
+	            var content = contentLoader.Get<IContent>(contentReference);
+	            bool.TryParse(content.Property["DisableIndexing"].ToString(), out bool noIndex);
+	            if (!noIndex)
+	            {
+					Log.Info("No-index flag is checked, skipping.");
+		            continue;
+	            }
 
                 var contentLanguages = this.GetLanguageBranches(contentReference);
 
