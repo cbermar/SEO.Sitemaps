@@ -44,7 +44,9 @@ namespace Geta.SEO.Sitemaps.XML
         protected IEnumerable<LanguageBranch> EnabledLanguages { get; set; }
         protected IEnumerable<CurrentLanguageContent> HrefLanguageContents { get; set; }
 
-        protected XNamespace SitemapXmlNamespace
+	    protected readonly IContentLoader ContentLoader;
+
+		protected XNamespace SitemapXmlNamespace
         {
             get { return @"http://www.sitemaps.org/schemas/sitemap/0.9"; }
         }
@@ -57,7 +59,7 @@ namespace Geta.SEO.Sitemaps.XML
         public bool IsDebugMode { get; set; }
 
         protected SitemapXmlGenerator(ISitemapRepository sitemapRepository, IContentRepository contentRepository, UrlResolver urlResolver, ISiteDefinitionRepository siteDefinitionRepository, ILanguageBranchRepository languageBranchRepository,
-            IContentFilter contentFilter)
+            IContentFilter contentFilter, IContentLoader contentLoader)
         {
             this.SitemapRepository = sitemapRepository;
             this.ContentRepository = contentRepository;
@@ -67,6 +69,7 @@ namespace Geta.SEO.Sitemaps.XML
             this.EnabledLanguages = this.LanguageBranchRepository.ListEnabled();
             this.UrlSet = new HashSet<string>();
             this.ContentFilter = contentFilter;
+	        this.ContentLoader = contentLoader;
         }
 
         protected virtual XElement GenerateRootElement()
@@ -178,8 +181,7 @@ namespace Geta.SEO.Sitemaps.XML
                 }
 
 				// check no-index flag
-	            var contentLoader = ServiceLocator.Current.GetInstance<IContentLoader>();
-	            var content = contentLoader.Get<IContent>(contentReference);
+	            var content = ContentLoader.Get<IContent>(contentReference);
 	            bool.TryParse(content.Property["DisableIndexing"].ToString(), out bool noIndex);
 	            if (!noIndex)
 	            {
