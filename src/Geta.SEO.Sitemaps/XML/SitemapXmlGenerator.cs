@@ -188,8 +188,9 @@ namespace Geta.SEO.Sitemaps.XML
 					Log.Info("No-index flag is checked, skipping.");
 		            continue;
 	            }
+	            Log.Info("No-index flag not checked.");
 
-                var contentLanguages = this.GetLanguageBranches(contentReference);
+	            var contentLanguages = this.GetLanguageBranches(contentReference);
 
                 foreach (var contentLanguageInfo in contentLanguages)
                 {
